@@ -121,7 +121,7 @@ function visualiseMyData(){
   push();
   fill(255);
   rectMode(CORNER);
-  rect(0,20,width/2,210);
+  rect(0,20,width/2,190);
   pop();
 
   // Debug text
