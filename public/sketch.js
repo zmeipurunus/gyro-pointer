@@ -65,23 +65,21 @@ function draw() {
   // -------- DESKTOP MESSAGE --------
   if (!isMobileDevice) {
     displayDesktopMessage();
-    return;// exit draw cycle early
+  }else{
+
+    // -------- WAITING FOR PERMISSION --------
+    if (!hasPermission) {
+      displayPermissionMessage();
+    }else{
+      
+      // --------  MY MOBILE DEVICE --------
+      //debug / show my own data
+      visualiseMyData();
+
+      // Send my data to the server (throttle via frameRate if needed)
+      emitData();
+    }
   }
-
-  // -------- WAITING FOR PERMISSION --------
-  if (!hasPermission) {
-    displayPermissionMessage();
-    return;// exit draw cycle early
-  }
-
-  // --------  MY MOBILE DEVICE --------
-
-  //debug / show my own data
-  visualiseMyData();
-
-  // Send my data to the server (throttle via frameRate if needed)
-  emitData();
-
 
 }
 
