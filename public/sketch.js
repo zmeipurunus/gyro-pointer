@@ -3,6 +3,9 @@ const socket = io();
 
 let canvas;
 
+let randomX;
+let randomY;
+
 // Permission button (iOS)
 let askButton;
 let isMobileDevice = true;
@@ -24,6 +27,10 @@ let leftToRight = 0;
 function setup() {
   canvas = createCanvas(windowWidth, windowHeight);
   canvas.parent("sketch-container"); 
+
+  //random position used for visualisation
+  randomX = random(50,width-50);
+  randomY = random(50,height-50);
 
   rectMode(CENTER);
   angleMode(DEGREES);
@@ -142,6 +149,10 @@ function visualiseMyData(){
 // SEND DATA TO SERVER
 function emitData(){
   socket.emit("motionData", {
+    screenPosition: { 
+      x: randomX,
+      y: randomY
+    },
     acceleration: {
       x: accX,
       y: accY,
@@ -176,6 +187,12 @@ function displayPermissionMessage() {
   text(message, width / 2, height / 2, width);//4th parameter to get text to wrap to new line if wider than canvas
 }
 
+function drawOthers(data){
+  let rectHeight = map(data.orientation.beta, -360,360,0,height);//front to back is beta
+  fill(255,0,0,100);
+  rect(data.screenPosition.x,0,30,rectHeight);
+}
+
 
 // --------------------
 // Socket events
@@ -189,7 +206,7 @@ socket.on("motionData", (data) => {
   console.log("Remote device data:", data);
 
   // Here is where another browser could visualise / react to data being sent
-
+  drawOthers(data);
 
 });
 
@@ -243,21 +260,25 @@ function windowResized() {
 // --------------------
 // Sensor handlers
 // --------------------
-
+// https://developer.mozilla.org/en-US/docs/Web/API/Window/devicemotion_event
 function deviceMotionHandler(event) {
   if (!event.acceleration || !event.rotationRate){
     return;
   }
 
+  //acceleration in meters per second
   accX = event.acceleration.x || 0;
   accY = event.acceleration.y || 0;
   accZ = event.acceleration.z || 0;
 
+  //degrees per second
   rrateZ = event.rotationRate.alpha || 0;
   rrateX = event.rotationRate.beta || 0;
   rrateY = event.rotationRate.gamma || 0;
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/API/Window/deviceorientation_event
+// https://developer.mozilla.org/en-US/docs/Web/API/Device_orientation_events/Orientation_and_motion_data_explained
 function deviceOrientationHandler(event) {
   rotateDegrees = event.alpha || 0;
   frontToBack = event.beta || 0;

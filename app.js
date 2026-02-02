@@ -7,7 +7,7 @@ import { Server } from "socket.io";
 const app = express();
 const server = http.createServer(app);//socket.io needs an http server
 const io = new Server(server);
-const port = process.env.PORT || 4000;
+const port = process.env.PORT || 4444;
 
 //Tell our Node.js Server to host our P5.JS sketch from the public folder
 app.use(express.static("public"));
