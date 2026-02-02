@@ -60,7 +60,7 @@ function setup() {
 }
 
 function draw() {
-  background(240);
+  background(240,30);//fade the background
 
   // -------- DESKTOP MESSAGE --------
   if (!isMobileDevice) {
@@ -71,7 +71,7 @@ function draw() {
     if (!hasPermission) {
       displayPermissionMessage();
     }else{
-      
+
       // --------  MY MOBILE DEVICE --------
       //debug / show my own data
       visualiseMyData();
