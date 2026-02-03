@@ -6,6 +6,9 @@ let canvas;
 let randomX;
 let randomY;
 
+let me; // for storing my socket.id
+let experienceState; //will just declare here as it's a big javascript object
+
 // Permission button (iOS)
 let askButton;
 let isMobileDevice = true;
@@ -23,6 +26,10 @@ let rrateZ = 0;
 let rotateDegrees = 0;
 let frontToBack = 0;
 let leftToRight = 0;
+
+// throttle device motion sending
+let lastSent = 0;
+const SEND_RATE = 30; // ms (~33 fps)
 
 function setup() {
   canvas = createCanvas(windowWidth, windowHeight);
@@ -62,17 +69,24 @@ function setup() {
 function draw() {
   background(240,30);//fade the background
 
-  // -------- DESKTOP MESSAGE --------
+  // DESKTOP MESSAGE 
   if (!isMobileDevice) {
     displayDesktopMessage();
   }else{
 
-    // -------- WAITING FOR PERMISSION --------
+    // WAITING FOR PERMISSION 
     if (!hasPermission) {
       displayPermissionMessage();
     }else{
 
-      // --------  MY MOBILE DEVICE --------
+      // draw all users including myself
+      for (let id in experienceState.users) {
+        const u = experienceState.users[id];
+
+        drawOthers(u);
+      }
+
+      // MY MOBILE DEVICE
       //debug / show my own data
       visualiseMyData();
 
@@ -86,6 +100,18 @@ function draw() {
 // --------------------
 // Custom Functions
 // --------------------
+
+//visualise other drawing
+function drawOthers(data){
+  let rectHeight = map(data.orientation.beta, -90,90,0,height);//front to back is beta
+  console.log(rectHeight,data.orientation.beta);
+  fill(0,0,255);
+  push();
+  rectMode(CORNER);
+  noStroke();
+  rect(data.screenPosition.x,0,40,rectHeight);
+  pop();
+}
 
 
 function visualiseMyData(){
@@ -152,6 +178,13 @@ function visualiseMyData(){
 
 // SEND DATA TO SERVER
 function emitData(){
+  //throttle
+  let now = millis();
+  if (now - lastSent < SEND_RATE){
+    return;
+  } 
+  lastSent = now;
+
   socket.emit("motionData", {
     screenPosition: { 
       x: randomX,
@@ -171,8 +204,7 @@ function emitData(){
       alpha: rotateDegrees,
       beta: frontToBack,
       gamma: leftToRight,
-    },
-    timestamp: Date.now()
+    }
   });
 }
 
@@ -191,33 +223,34 @@ function displayPermissionMessage() {
   text(message, width / 2, 30, width);//4th parameter to get text to wrap to new line if wider than canvas
 }
 
-//visualise other drawing
-function drawOthers(data){
-  let rectHeight = map(data.orientation.beta, -90,90,0,height);//front to back is beta
-  console.log(rectHeight,data.orientation.beta);
-  fill(0,0,255);
-  push();
-  rectMode(CORNER);
-  noStroke();
-  rect(data.screenPosition.x,0,40,rectHeight);
-  pop();
-}
-
-
 // --------------------
 // Socket events
 // --------------------
 
-socket.on("connect", () => {
-  console.log("Connected:", socket.id);
+// initial full state
+socket.on("init", (data) => {
+  me = data.id;
+  experienceState = data.state;
+  console.log(experienceState);
 });
 
-socket.on("motionData", (data) => {
-  console.log("Remote device data:", data);
+// someone joined
+socket.on("userJoined", (data) => {
+  experienceState.users[data.id] = data.user;
+});
 
-  // Here is where another browser could visualise / react to data being sent
-  drawOthers(data);
+// someone left
+socket.on("userLeft", (id) => {
+  delete experienceState.users[id];
+});
 
+// someone moved
+socket.on("userMoved", (data) => {
+  console.log(motionData);
+  let id = data.id;
+  if (experienceState.users[id]) {
+    experienceState.users[id] = data.motion
+  }
 });
 
 // --------------------
