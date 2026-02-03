@@ -69,7 +69,17 @@ function setup() {
 }
 
 function draw() {
-  background(240,30);//fade the background
+  background(240);
+
+  //draw movers for everyone
+  // console.log(experienceState.users);
+  // draw all users including myself
+  for (let id in experienceState.users) {
+    //if I'm a moving device not a PC / laptop
+    if(experienceState.users[id].deviceMoves){
+      drawOthers(id);
+    }
+  }
 
   // DESKTOP MESSAGE 
   if (!isMobileDevice) {
@@ -90,16 +100,6 @@ function draw() {
     }
   }
 
-  //draw movers for everyone
-  console.log(experienceState.users);
-  // draw all users including myself
-  for (let id in experienceState.users) {
-    //if I'm a moving device not a PC / laptop
-    if(experienceState.users[id].deviceMoves){
-      drawOthers(id);
-    }
-  }
-
 }
 
 // --------------------
@@ -114,7 +114,7 @@ function drawOthers(id){
 
   let rectHeight = map(motion.orientation.beta, -90,90,0,height);//front to back is beta
   console.log(rectHeight,motion.orientation.beta);
-  fill(0,0,255);
+  fill(0,0,255,200);// slightly transparent
   push();
   rectMode(CORNER);
   noStroke();
@@ -130,11 +130,12 @@ function visualiseMyData(){
     Math.abs(accX) + Math.abs(accY) + Math.abs(accZ);
 
   if (totalMovement > 2) {
-    background(255, 0, 0);
+    background(255, 0, 0, 50); // make it slightly transparent
   }
 
   // Orientation arrows
   push();
+  fill(0);
   translate(width / 2, height / 2);
 
   if (frontToBack > 40) {
@@ -217,6 +218,7 @@ function emitData(){
     }
   };
 
+  // update experience state in my browser 
   experienceState.users[me].deviceMoves = true;
   experienceState.users[me].motionData = myMotionData;
 
