@@ -109,15 +109,16 @@ function draw() {
 //visualise other drawing
 function drawOthers(id){
   let u = experienceState.users[id];
+  let motion = u.motionData;
   console.log(u);
 
-  let rectHeight = map(u.orientation.beta, -90,90,0,height);//front to back is beta
-  console.log(rectHeight,u.orientation.beta);
+  let rectHeight = map(motion.orientation.beta, -90,90,0,height);//front to back is beta
+  console.log(rectHeight,motion.orientation.beta);
   fill(0,0,255);
   push();
   rectMode(CORNER);
   noStroke();
-  rect(u.screenPosition.x,0,40,rectHeight);
+  rect(motion.screenPosition.x,0,40,rectHeight);
   pop();
 
 }
