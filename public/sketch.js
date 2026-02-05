@@ -80,6 +80,10 @@ function draw() {
     y -= 2; // Top 
   }
   
+  // Constrain the position to canvas bounds
+  x = constrain(x, 0, width);
+  y = constrain(y, 0, height);
+  
   let target = createVector(x, y);
   for (let f of followers) {
     f.arrive(target);
