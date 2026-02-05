@@ -11,6 +11,9 @@ const io = new Server(httpServer, {
   }
 });
 
+// Serve static files from the public folder
+app.use(express.static('public'));
+
 // Configuration
 const PORT = process.env.PORT || 3000;
 const SCREEN_WIDTH = 3840;
@@ -27,7 +30,6 @@ function getRandomCoordinates() {
   return { x, y };
 }
 
-app.use(express.static("public"));
 // Handle client connections
 io.on('connection', (socket) => {
   console.log('Client connected:', socket.id);
@@ -59,7 +61,7 @@ io.on('connection', (socket) => {
 
 // Health check endpoint for Render
 app.get('/', (req, res) => {
-  res.send('Gyro Pointer Server Running');
+  res.sendFile('public/index.html', { root: '.' });
 });
 
 // Start server
