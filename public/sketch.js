@@ -67,22 +67,14 @@ function draw() {
   noStroke();
   circle(x, y,10);
   
-  if (leftToRight > 10) { 
-    x += 2; // Right
-  } 
-  if (leftToRight < -10) { 
-    x -= 2; // Left
-  }
-  if (frontToBack > 10) { 
-    y += 2; // Down
-  } 
-  if (frontToBack < -10) { 
-    y -= 2; // Top 
-  }
+  // Move ball proportionally to tilt angle (smoother control across full canvas)
+  // Scale tilt angles to movement: each degree of tilt = movement pixels
+  x += (leftToRight / 90) * 5; // Map -90 to 90 degrees to significant movement
+  y += (frontToBack / 90) * 5;
   
-  // Constrain the position to canvas bounds
-  x = constrain(x, 0, width);
-  y = constrain(y, 0, height);
+  // Constrain ball to canvas boundaries
+  x = constrain(x, 5, width - 5);
+  y = constrain(y, 5, height - 5);
   
   let target = createVector(x, y);
   for (let f of followers) {
@@ -94,8 +86,8 @@ function draw() {
   // Emit cursor position to server (throttled to every 2 frames)
   if (frameCount % 2 === 0) {
     socket.emit('cursor-update', {
-      x: x,
-      y: y
+      x: x / width,
+      y: y / height
     });
   }
 
