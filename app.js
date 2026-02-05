@@ -18,7 +18,7 @@ app.use(express.static('public'));
 const PORT = process.env.PORT || 3000;
 const SCREEN_WIDTH = 3840;
 const SCREEN_HEIGHT = 2400;
-const EMIT_INTERVAL = 200; // milliseconds between each coordinate emit (simulate mouse delay)
+const EMIT_INTERVAL = 50; // milliseconds between each coordinate emit (simulate mouse delay)
 
 // Store the latest cursor coordinates (normalized 0-1)
 let cursorCoords = { x: 0.5, y: 0.5 };

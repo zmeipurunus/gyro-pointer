@@ -87,7 +87,7 @@ function draw() {
     f.display();
   }
   
-  // Emit cursor position to server (throttled to every 5 frames)
+  // Emit cursor position to server (throttled to every 2 frames)
   if (frameCount % 2 === 0) {
     socket.emit('cursor-update', {
       x: x / width,
