@@ -27,6 +27,7 @@ function getRandomCoordinates() {
   return { x, y };
 }
 
+app.use(express.static("public"));
 // Handle client connections
 io.on('connection', (socket) => {
   console.log('Client connected:', socket.id);
