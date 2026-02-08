@@ -54,5 +54,4 @@ app.get('/', (req, res) => {
 // Start server
 httpServer.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
-  console.log(`Screen dimensions: ${SCREEN_WIDTH}x${SCREEN_HEIGHT}`);
 });
