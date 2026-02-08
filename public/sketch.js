@@ -1,6 +1,27 @@
-//global variables
+/*
+
+Sketch Name: PopCat Remote Controller
+Date: Feb 5, 2026
+Made by: Zihan Mei (zmei001), Yi-Ho Li (yli102)
+
+Reference:
+  1. MobileDeviceOrientation by beckyaston 
+  (https://editor.p5js.org/beckyaston/sketches/5wtxAxSpZ)
+  
+  2. Nature of Code, Chapter 5: Autonomous Agents
+  (https://natureofcode.com/)
+  
+  3. Images of the Pop Cat 
+  (https://popcat.click/)
+
+Generative AI Use Statement:
+I acknowledge the use of Google Gemini(https://gemini.google.com/share/71bef38391e1) to debug code and to explain code. All parameters and values have been tested and adjusted by the author.
+
+*/
+
+
 let askButton;
-const socket = io();
+const socket = io();  // initialize socket -Zihan
 
 // device motion
 let accX = 0;
@@ -10,9 +31,14 @@ let rrateX = 0;
 let rrateY = 0; 
 let rrateZ = 0;
 
-let x
-let y 
-let followers = [];
+let x;
+let y;
+
+let catFoodFollowers = [];
+
+let catEatImage;
+let catSmileImage;
+let isMouthOpen = true; // Default state: mouth open (catEatImage)
 
 
 // device orientation
@@ -20,10 +46,14 @@ let rotateDegrees = 0;
 let frontToBack = 0; 
 let leftToRight = 0; 
 
-function setup() {
-  canvas = createCanvas(windowWidth, windowHeight);
-  canvas.parent("sketch-container"); 
+function preload() {
+  catEatImage = loadImage('popcat_eat.png');
+  catSmileImage = loadImage('popcat_smile.png');
+}
 
+
+function setup() {
+  createCanvas(windowWidth, windowHeight);
   rectMode(CENTER);
   angleMode(DEGREES);
   
@@ -31,7 +61,7 @@ function setup() {
   y = height/2
   
   for (let i = 0; i < 10; i++) {
-    followers.push(new Vehicle(random(width), random(height)));
+    catFoodFollowers.push(new Catfood(random(width), random(height)));
   }
   
   //----------
@@ -46,69 +76,36 @@ function setup() {
     window.addEventListener('deviceorientation', deviceTurnedHandler, true)
   }
   
-  //----------
+  imageMode(CENTER);
   
 }
 
 //we are using p5.js to visualise this movement data
 function draw() {
+  
+  // // Get the maximum tilt value and map it to a grayscale color (0-100)
+  let tilt = max(abs(frontToBack), abs(leftToRight));
+  let bgGray = map(tilt, 0, 45, 0, 100); 
+  background(bgGray);
 
-  
-  
-  let totalMovement = Math.abs(accX)+Math.abs(accY)+Math.abs(accZ);//movement in any direction
-  //set your own threshold for how sensitive you want this to be
-  if(totalMovement > 2){
-     background(0,255,0);
-  }else{
-     background(255);
-  }
-  
-  fill(0); 
-  noStroke();
-  circle(x, y,10);
-  
-  // Move ball proportionally to tilt angle (smoother control across full canvas)
-  // Scale tilt angles to movement: each degree of tilt = movement pixels
-  x += (leftToRight / 90) * 5; // Map -90 to 90 degrees to significant movement
-  y += (frontToBack / 90) * 5;
-  
-  // Constrain ball to canvas boundaries
-  x = constrain(x, 5, width - 5);
-  y = constrain(y, 5, height - 5);
-  
-  let target = createVector(x, y);
-  for (let f of followers) {
-    f.arrive(target);
-    f.update();
-    f.display();
-  }
-  
-  // Emit cursor position to server (throttled to every 2 frames)
-  if (frameCount % 2 === 0) {
-    socket.emit('cursor-update', {
-      x: x / width,
-      y: y / height
-    });
-  }
 
-  
   //Creating a tilt sensor mechanic that has a sort of boolean logic (on or off)
   //if the phone is rotated front/back/left/right we will get an arrow point in that direction 
   push();
-  translate(width/2,height/2);
+  translate(width - 60, 50);
  
   if(frontToBack > 1){ //down
     push();
     fill(100);
     rotate(-180);
-    triangle(-15, -20, 0, -50, 15, -20);
+    triangle(-15, -20, 0, -40, 15, -20);
     pop();
     
     
   }else if(frontToBack < -1){ //top
     push();
     fill(100);
-    triangle(-15, -20, 0, -50, 15, -20);
+    triangle(-15, -20, 0, -40, 15, -20);
     pop();
   }
   
@@ -116,33 +113,84 @@ function draw() {
     push();
     fill(100);
     rotate(90);
-    triangle(-15, -20, 0, -50, 15, -20);
+    triangle(-15, -20, 0, -40, 15, -20);
     pop();
   }else if(leftToRight < -1){//left
     push();
     fill(100);
     rotate(-90);
-    triangle(-15, -20, 0, -50, 15, -20);
+    triangle(-15, -20, 0, -40, 15, -20);
     pop();
   }
   pop();
   
   //Debug text
-  fill(0);
-  textSize(15);
+  fill(200);
+  textSize(10);
   
-  text("acceleration: ",10,10);
-  text(accX.toFixed(2) +", "+accY.toFixed(2)+", "+accZ.toFixed(2),10,40);
+  text("acceleration: ",10,20);
+  text(accX.toFixed(2) +", "+accY.toFixed(2)+", "+accZ.toFixed(2),10,30);
 
-  text("rotation rate: ",10,80);
-  text(rrateX.toFixed(2) +", "+rrateY.toFixed(2)+", "+rrateZ.toFixed(2),10,110);
+  text("rotation rate: ",10,50);
+  text(rrateX.toFixed(2) +", "+rrateY.toFixed(2)+", "+rrateZ.toFixed(2),10,60);
   
   
-  text("device orientation: ",10,150);
-  text(rotateDegrees.toFixed(2) +", "+leftToRight.toFixed(2) +", "+frontToBack.toFixed(2),10,180);  
+  text("device orientation: ",10,80);
+  text(rotateDegrees.toFixed(2) +", "+leftToRight.toFixed(2) +", "+frontToBack.toFixed(2),10,90);  
   
+  
+  let currentlyEating = isMouthOpen;
+  
+  // if (currentlyEating) {
+  //   if (leftToRight > 1) { 
+  //     x += 5; //move right
+  //   } 
+  //   if (leftToRight < -1) { 
+  //     x -= 5; //move left
+  //   }
+  //   if (frontToBack > 1) { 
+  //     y += 5; //move down
+  //   } 
+  //   if (frontToBack < -1) { 
+  //     y -= 5; //move up
+  //   }
+  // }
+
+  // Updated movement handling -- Zihan
+  x += (leftToRight / 90) * 5;
+  y += (frontToBack / 90) * 5;
+
+  
+  x = constrain(x, 80, width -80);  
+  y = constrain(y, 80, height -80);
+  
+  let target = createVector(x + 30, y + 10);
+  
+  // emit data to server -- Zihan
+  if (frameCount % 2 === 0) {
+    socket.emit('cursor-update', {
+      x: x / width,
+      y: y / height
+    });
+  }  
+  
+
+  if (currentlyEating) {
+    if (catEatImage) image(catEatImage, x, y, 150, 150);
+  } else {
+    if (catSmileImage) image(catSmileImage, x, y, 150, 150);
+  }
+      
+  for (let f of catFoodFollowers) {
+    if (currentlyEating) {
+      f.arrive(target);    // Calculate the force to follow the cat
+      f.update();          // Update position based on force
+      f.checkEat(target);  // Check if the catFoodFollowers is eaten
+    }
+    
+    f.display();
+  }
 }
-
 
 //Everything below here you could move to a three.js or other javascript sketch
 
@@ -192,18 +240,41 @@ function deviceTurnedHandler(event){
 
 }
 
-class Vehicle {
+
+class Catfood {
   constructor(x, y) {
     this.position = createVector(x, y);
     this.velocity = createVector(0, 0);
     this.acceleration = createVector(0, 0);
-    this.maxspeed = random(2, 5); 
-    this.maxforce = random(0.05, 0.2);
-    this.color = color(random(255), random(255), random(255), 150);
-    this.shapeType = floor(random(3)); // 0:圓, 1:方, 2:三角
-    this.size = random(15, 30);
+    this.maxspeed = random(2, 6); 
+    this.maxforce = random(0.1, 0.3);
+    this.reset(); 
+  }
+  
+  //Check if the food is close enough to be "eaten"
+  checkEat(target) {
+    let d = p5.Vector.dist(this.position, target);
+    if (d < 20) { //set the mouth space to be checked
+      this.reset();
+    }
   }
 
+  // Reset the food to a random side of the screen
+  reset() {
+    //Pick a random side: 0 = Top, 1 = Bottom, 2 = Left, 3 = Right
+    let side = floor(random(4));
+    if (side === 0) this.position = createVector(random(width), -20);
+    else if (side === 1) this.position = createVector(random(width), height + 20);
+    else if (side === 2) this.position = createVector(-20, random(height));
+    else this.position = createVector(width + 20, random(height));
+    
+    // Set a random color with 180 transparency
+    this.color = color(random(255), random(255), random(255), 180);
+    // Pick a random size for the food circle
+    this.size = random(10, 25);
+  }
+
+  // Steering logic to follow the target
   arrive(target) {
     let desired = p5.Vector.sub(target, this.position);
     let d = desired.mag();
@@ -218,6 +289,7 @@ class Vehicle {
     this.acceleration.add(steer);
   }
 
+  // Move the food
   update() {
     this.velocity.add(this.acceleration);
     this.velocity.limit(this.maxspeed);
@@ -225,25 +297,28 @@ class Vehicle {
     this.acceleration.mult(0);
   }
 
+  // Draw the food
   display() {
     fill(this.color);
     noStroke();
     push();
     translate(this.position.x, this.position.y);
-    if (this.shapeType === 0) {
-      circle(0, 0, this.size);
-    } else if (this.shapeType === 1) {
-      rect(0, 0, this.size, this.size);
-    } else {
-      triangle(0, -this.size/2, -this.size/2, this.size/2, this.size/2, this.size/2);
-    }
+    circle(0, 0, this.size);
+    
     pop();
   }
 }
 
-// --------------------
-// Socket events
-// --------------------
+//Touch or click functions to change the mouth status
+function mousePressed() {
+  isMouthOpen = false; //Change to "catEatImage"
+}
+
+function mouseReleased() {
+  isMouthOpen = true; //Change back to "catEatImage"
+}
+
+// SOCKETS -- Zihan
 
 // initial full state
 socket.on("init", (data) => {
