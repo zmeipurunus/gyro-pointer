@@ -305,18 +305,16 @@ function touchEnded() {
   socket.emit('cursor-up', { button: 'left' });
   return false;
 }
-// // desktop
-// function mousePressed() {
-//   isMouthOpen = false; //Change to "catEatImage"
-//   socket.emit('cursor-down', { button: 'left' });
-//   console.log("click")
-// }
+// desktop
+function mousePressed() {
+  isMouthOpen = false; //Change to "catEatImage"
+  socket.emit('cursor-down', { button: 'left' });
+}
 
-// function mouseReleased() {
-//   isMouthOpen = true; //Change back to "catEatImage"
-//   // Emit click event to server when user clicks
-//   socket.emit('cursor-down', { button: 'left' });
-// }
+function mouseReleased() {
+  isMouthOpen = true; //Change back to "catEatImage"
+  socket.emit('cursor-up', { button: 'left' });
+}
 
 // SOCKETS -- Zihan
 
