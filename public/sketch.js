@@ -53,7 +53,8 @@ function preload() {
 
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+  canvas = createCanvas(windowWidth, windowHeight);
+  canvas.parent("sketch-container"); 
   rectMode(CENTER);
   angleMode(DEGREES);
   
