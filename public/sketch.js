@@ -161,8 +161,8 @@ function draw() {
   y += (frontToBack / 90) * 5;
 
   
-  x = constrain(x, 80, width -80);  
-  y = constrain(y, 80, height -80);
+  x = constrain(x, 0, width);  
+  y = constrain(y, 0, height);
   
   let target = createVector(x + 30, y + 10);
   
@@ -213,9 +213,6 @@ function handlePermissionButtonPressed(){
     })
     .catch(console.error);  
 }
-
-//AVERAGE YOUR DATA!!!
-//Microphone input from last term.... 
 
 // https://developer.mozilla.org/en-US/docs/Web/API/Window/devicemotion_event
 function deviceMotionHandler(event){
