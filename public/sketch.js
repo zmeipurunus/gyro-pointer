@@ -66,7 +66,6 @@ function setup() {
   }
   
   //----------
-  //the bit between the two comment lines could be move to a three.js sketch except you'd need to create a button there
   if(typeof DeviceMotionEvent.requestPermission === 'function' && typeof DeviceOrientationEvent.requestPermission === 'function'){
     // iOS 13+
     askButton = createButton('Permission');//p5 create button
@@ -313,6 +312,7 @@ class Catfood {
 //Touch or click functions to change the mouth status
 function mousePressed() {
   isMouthOpen = false; //Change to "catEatImage"
+  console.log("click")
 }
 
 function mouseReleased() {
