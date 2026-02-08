@@ -295,25 +295,24 @@ class Catfood {
 // mobile-compatible -- Zihan
 function touchStarted() {
   isMouthOpen = false;
-  socket.emit('cursor-down', { button: 'left' });
+  socket.emit('cursor-down');
   return false;
 }
 
 function touchEnded() {
   isMouthOpen = true;
-  // Emit click event to server when user taps the canvas
-  socket.emit('cursor-up', { button: 'left' });
+  socket.emit('cursor-up');
   return false;
 }
 // desktop
 function mousePressed() {
   isMouthOpen = false; //Change to "catEatImage"
-  socket.emit('cursor-down', { button: 'left' });
+  socket.emit('cursor-down');
 }
 
 function mouseReleased() {
   isMouthOpen = true; //Change back to "catEatImage"
-  socket.emit('cursor-up', { button: 'left' });
+  socket.emit('cursor-up');
 }
 
 // SOCKETS -- Zihan

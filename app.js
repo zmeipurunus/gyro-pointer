@@ -39,14 +39,14 @@ io.on('connection', (socket) => {
   // });
 
   // Listen for mouse down / up events from the phone client and forward them
-  socket.on('cursor-down', (data) => {
+  socket.on('cursor-down', () => {
     console.log('Cursor down received from phone');
-    io.emit('cursor-down', data);
+    io.emit('cursor-down');
   });
 
-  socket.on('cursor-up', (data) => {
+  socket.on('cursor-up', () => {
     console.log('Cursor up received from phone');
-    io.emit('cursor-up', data);
+    io.emit('cursor-up');
   });
   
   // Start sending normalized coordinates to this client
