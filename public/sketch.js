@@ -310,6 +310,17 @@ class Catfood {
 }
 
 //Touch or click functions to change the mouth status
+// mobile-compatible -- Zihan
+function touchStarted() {
+  isMouthOpen = false;
+  return false;
+}
+
+function touchEnded() {
+  isMouthOpen = true;
+  return false;
+}
+// desktop
 function mousePressed() {
   isMouthOpen = false; //Change to "catEatImage"
   console.log("click")
