@@ -31,11 +31,22 @@ io.on('connection', (socket) => {
     console.log('Cursor updated from phone:', cursorCoords);
   });
   
-  // Listen for click events from the phone client
-  socket.on('cursor-click', (data) => {
-    console.log('Click received from phone');
-    // Broadcast click to all connected desktop clients
-    io.emit('cursor-click', data);
+  // // Listen for click events from the phone client
+  // socket.on('cursor-click', (data) => {
+  //   console.log('Click received from phone');
+  //   // Broadcast click to all connected desktop clients
+  //   io.emit('cursor-click', data);
+  // });
+
+  // Listen for mouse down / up events from the phone client and forward them
+  socket.on('cursor-down', (data) => {
+    console.log('Cursor down received from phone');
+    io.emit('cursor-down', data);
+  });
+
+  socket.on('cursor-up', (data) => {
+    console.log('Cursor up received from phone');
+    io.emit('cursor-up', data);
   });
   
   // Start sending normalized coordinates to this client
