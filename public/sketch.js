@@ -142,8 +142,8 @@ function draw() {
   let currentlyEating = isMouthOpen;
   
   // Updated movement handling -- Zihan
-  x += (leftToRight / 90) * 5;
-  y += (frontToBack / 90) * 5;
+  x += (leftToRight / 90) * 8;
+  y += (frontToBack / 90) * 8;
 
   
   x = constrain(x, 0, width);  
