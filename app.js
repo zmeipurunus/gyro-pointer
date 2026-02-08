@@ -16,19 +16,10 @@ app.use(express.static('public'));
 
 // Configuration
 const PORT = process.env.PORT || 3000;
-const SCREEN_WIDTH = 3840;
-const SCREEN_HEIGHT = 2400;
-const EMIT_INTERVAL = 50; // milliseconds between each coordinate emit (simulate mouse delay)
+const EMIT_INTERVAL = 50; // milliseconds between each coordinate emit
 
-// Store the latest cursor coordinates (normalized 0-1)
+// Store the latest cursor coordinates (normalized 0-1 range)
 let cursorCoords = { x: 0.5, y: 0.5 };
-
-// Generate random coordinates
-function getRandomCoordinates() {
-  const x = Math.floor(Math.random() * SCREEN_WIDTH);
-  const y = Math.floor(Math.random() * SCREEN_HEIGHT);
-  return { x, y };
-}
 
 // Handle client connections
 io.on('connection', (socket) => {
@@ -40,16 +31,12 @@ io.on('connection', (socket) => {
     console.log('Cursor updated from phone:', cursorCoords);
   });
   
-  // Start sending coordinates to this client
+  // Start sending normalized coordinates to this client
   const intervalId = setInterval(() => {
-    // Map normalized coordinates to screen size
-    const coords = {
-      x: Math.round(cursorCoords.x * SCREEN_WIDTH),
-      y: Math.round(cursorCoords.y * SCREEN_HEIGHT)
-    };
-    socket.emit('cursor-move', coords);
+    // Emit normalized coordinates (0-1 range) to desktop client
+    socket.emit('cursor-move', cursorCoords);
     // Uncomment for debugging:
-    // console.log(`Sent to ${socket.id}:`, coords);
+    // console.log(`Sent to ${socket.id}:`, cursorCoords);
   }, EMIT_INTERVAL);
   
   // Clean up on disconnect
