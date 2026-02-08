@@ -300,6 +300,8 @@ function touchStarted() {
 
 function touchEnded() {
   isMouthOpen = true;
+  // Emit click event to server when user taps the canvas
+  socket.emit('cursor-click', { button: 'left' });
   return false;
 }
 // desktop
@@ -310,6 +312,8 @@ function mousePressed() {
 
 function mouseReleased() {
   isMouthOpen = true; //Change back to "catEatImage"
+  // Emit click event to server when user clicks
+  socket.emit('cursor-click', { button: 'left' });
 }
 
 // SOCKETS -- Zihan

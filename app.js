@@ -31,6 +31,13 @@ io.on('connection', (socket) => {
     console.log('Cursor updated from phone:', cursorCoords);
   });
   
+  // Listen for click events from the phone client
+  socket.on('cursor-click', (data) => {
+    console.log('Click received from phone');
+    // Broadcast click to all connected desktop clients
+    io.emit('cursor-click', data);
+  });
+  
   // Start sending normalized coordinates to this client
   const intervalId = setInterval(() => {
     // Emit normalized coordinates (0-1 range) to desktop client
