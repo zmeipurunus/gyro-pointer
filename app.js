@@ -21,22 +21,44 @@ const EMIT_INTERVAL = 50; // milliseconds between each coordinate emit
 // Store the latest cursor coordinates (normalized 0-1 range)
 let cursorCoords = { x: 0.5, y: 0.5 };
 
+// Track connected clients (only one mobile and one desktop allowed)
+let mobileClient = null;
+let desktopClient = null;
+
 // Handle client connections
 io.on('connection', (socket) => {
   console.log('Client connected:', socket.id);
+  
+  // Listen for client identification
+  socket.on('identify', (clientType) => {
+    if (clientType === 'mobile') {
+      // Check if mobile client already connected
+      if (mobileClient !== null) {
+        console.log('Mobile client rejected - one already connected:', socket.id);
+        socket.emit('rejected', 'Mobile client already connected');
+        socket.disconnect();
+        return;
+      }
+      mobileClient = socket.id;
+      console.log('Mobile client identified:', socket.id);
+    } else if (clientType === 'desktop') {
+      // Check if desktop client already connected
+      if (desktopClient !== null) {
+        console.log('Desktop client rejected - one already connected:', socket.id);
+        socket.emit('rejected', 'Desktop client already connected');
+        socket.disconnect();
+        return;
+      }
+      desktopClient = socket.id;
+      console.log('Desktop client identified:', socket.id);
+    }
+  });
   
   // Listen for cursor updates from the phone client
   socket.on('cursor-update', (data) => {
     cursorCoords = data;
     console.log('Cursor updated from phone:', cursorCoords);
   });
-  
-  // // Listen for click events from the phone client
-  // socket.on('cursor-click', (data) => {
-  //   console.log('Click received from phone');
-  //   // Broadcast click to all connected desktop clients
-  //   io.emit('cursor-click', data);
-  // });
 
   // Listen for mouse down / up events from the phone client and forward them
   socket.on('cursor-down', () => {
@@ -60,6 +82,17 @@ io.on('connection', (socket) => {
   // Clean up on disconnect
   socket.on('disconnect', () => {
     console.log('Client disconnected:', socket.id);
+    
+    // Clear client tracking
+    if (socket.id === mobileClient) {
+      mobileClient = null;
+      console.log('Mobile client disconnected');
+    }
+    if (socket.id === desktopClient) {
+      desktopClient = null;
+      console.log('Desktop client disconnected');
+    }
+    
     clearInterval(intervalId);
   });
 });

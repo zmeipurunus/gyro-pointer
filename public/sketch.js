@@ -23,6 +23,17 @@ I acknowledge the use of Google Gemini(https://gemini.google.com/share/71bef3839
 let askButton;
 const socket = io();  // initialize socket -Zihan
 
+// Identify this client as mobile to the server
+socket.on('connect', () => {
+  socket.emit('identify', 'mobile');
+});
+
+// Handle rejection if another mobile client is already connected
+socket.on('rejected', (message) => {
+  console.error('Connection rejected:', message);
+  alert(message);
+});
+
 // device motion
 let accX = 0;
 let accY = 0; 
