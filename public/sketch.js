@@ -141,21 +141,6 @@ function draw() {
   
   let currentlyEating = isMouthOpen;
   
-  // if (currentlyEating) {
-  //   if (leftToRight > 1) { 
-  //     x += 5; //move right
-  //   } 
-  //   if (leftToRight < -1) { 
-  //     x -= 5; //move left
-  //   }
-  //   if (frontToBack > 1) { 
-  //     y += 5; //move down
-  //   } 
-  //   if (frontToBack < -1) { 
-  //     y -= 5; //move up
-  //   }
-  // }
-
   // Updated movement handling -- Zihan
   x += (leftToRight / 90) * 5;
   y += (frontToBack / 90) * 5;
